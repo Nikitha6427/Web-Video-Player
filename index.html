@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Player</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="stars stars-layer-1" aria-hidden="true"></div>
+    <div class="stars stars-layer-2" aria-hidden="true"></div>
+    <div class="nebula" aria-hidden="true"></div>
+
+    <main class="app">
+      <section
+        class="drop-zone"
+        id="dropZone"
+        role="button"
+        tabindex="0"
+        aria-label="Drop a video file or click to browse"
+      >
+        <input
+          id="videoInput"
+          class="visually-hidden"
+          type="file"
+          accept="video/mp4,.mkv"
+        />
+        <div class="drop-zone-inner">
+          <div class="star-icon" aria-hidden="true">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="8"></circle>
+              <path
+                d="M50 8 L58 35 L92 35 L64 53 L74 86 L50 66 L26 86 L36 53 L8 35 L42 35 Z"
+              ></path>
+            </svg>
+          </div>
+          <h1>Drop a video file or click to browse</h1>
+          <p>
+            Supported containers: MP4 and MKV (codec support depends on
+            browser).
+          </p>
+        </div>
+      </section>
+
+      <section class="player-shell hidden" id="playerShell">
+        <div
+          class="message-banner hidden"
+          id="messageBanner"
+          role="status"
+          aria-live="polite"
+        ></div>
+        <div class="video-stage" id="videoStage">
+          <video id="video" preload="metadata" playsinline></video>
+
+          <div class="big-play hidden" id="bigPlay" aria-hidden="true">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="34,22 78,50 34,78"></polygon>
+            </svg>
+          </div>
+
+          <div
+            class="transcode-overlay hidden"
+            id="transcodeOverlay"
+            aria-live="polite"
+          >
+            <div class="transcode-card">
+              <div class="transcode-spinner" aria-hidden="true"></div>
+              <h2 id="transcodeTitle">
+                Preparing MKV file... this may take a moment
+              </h2>
+              <p id="transcodeStatus">Transcoding... 0%</p>
+              <div class="transcode-progress-track">
+                <div
+                  class="transcode-progress-fill"
+                  id="transcodeProgressFill"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subtitle-panel hidden" id="subtitlePanel">
+            <label class="sub-control-row file-row" for="subtitleInput"
+              >Load subtitle file (.vtt / .srt)</label
+            >
+            <input
+              id="subtitleInput"
+              type="file"
+              accept=".vtt,.srt,text/vtt,application/x-subrip"
+            />
+
+            <div class="sub-control-row toggle-row">
+              <span>Subtitles</span>
+              <button
+                type="button"
+                class="mini-toggle"
+                id="subtitleToggle"
+                aria-pressed="false"
+              >
+                Off
+              </button>
+            </div>
+
+            <div class="sub-control-row">
+              <label for="subtitleSize">Font size</label>
+              <input
+                id="subtitleSize"
+                type="range"
+                min="14"
+                max="42"
+                step="1"
+                value="24"
+              />
+            </div>
+          </div>
+
+          <div class="controls" id="controls">
+            <div class="seek-row">
+              <div class="seek-track-wrap" id="seekTrackWrap">
+                <div class="seek-buffer" id="seekBuffer"></div>
+                <div class="seek-progress" id="seekProgress"></div>
+                <input
+                  id="seekBar"
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value="0"
+                  aria-label="Seek"
+                />
+              </div>
+            </div>
+
+            <div class="controls-row">
+              <button
+                id="playPauseBtn"
+                class="icon-btn"
+                type="button"
+                aria-label="Play/Pause"
+              >
+                <span class="icon-play" aria-hidden="true">
+                  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="30,20 78,50 30,80"></polygon>
+                  </svg>
+                </span>
+                <span class="icon-pause" aria-hidden="true">
+                  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="28" y="20" width="16" height="60"></rect>
+                    <rect x="56" y="20" width="16" height="60"></rect>
+                  </svg>
+                </span>
+              </button>
+
+              <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+
+              <div class="volume-cluster">
+                <button
+                  id="muteBtn"
+                  class="icon-btn"
+                  type="button"
+                  aria-label="Mute/Unmute"
+                >
+                  Vol
+                </button>
+                <input
+                  id="volumeBar"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value="1"
+                  aria-label="Volume"
+                />
+              </div>
+
+              <label class="speed-wrap" for="speedSelect">
+                <span>Speed</span>
+                <select id="speedSelect" aria-label="Playback Speed">
+                  <option value="0.5">0.5x</option>
+                  <option value="0.75">0.75x</option>
+                  <option value="1" selected>1x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                  <option value="2">2x</option>
+                </select>
+              </label>
+
+              <label class="audio-wrap hidden" id="audioWrap" for="audioSelect">
+                <span>Audio</span>
+                <select id="audioSelect" aria-label="Audio Track"></select>
+              </label>
+
+              <button
+                id="ccBtn"
+                class="icon-btn text-btn"
+                type="button"
+                aria-label="Subtitles"
+              >
+                CC
+              </button>
+              <button
+                id="fullscreenBtn"
+                class="icon-btn text-btn"
+                type="button"
+                aria-label="Toggle Fullscreen"
+              >
+                Full
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/umd/ffmpeg.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/util.js"></script>
+    <script src="player.js"></script>
+  </body>
+</html>
